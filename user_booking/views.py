@@ -57,7 +57,8 @@ def sign_up(request):
             return redirect('index')
     else:
         return redirect('user_login')
-    
+
+@login_required
 def personal_info(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -72,7 +73,8 @@ def personal_info(request):
             return redirect('index')
     else:
         return render(request, 'personal_info.html')
-    
+
+@login_required
 def upload_hotel_csv(request):
     if request.method == "POST":
         form = CSVUploadForm(request.POST, request.FILES)
@@ -112,16 +114,46 @@ def upload_hotel_csv(request):
 
 @login_required
 def book_hotel(request):
-
-
     if request.method == "GET":
         hotel_id = request.GET.get('hotel_id')
         rooms = Hotel.objects.filter(hotel_id=hotel_id)
         hotel = rooms[0]
         user = request.user  # Get the logged-in user
-        
+        username = user.username
+        personal_info = Personal_data.objects.get(username=username)
+        if personal_info is None:
+            return render(request, 'book_hotel.html', {'hotel': hotel,'rooms': rooms,'user': user,})
         return render(request, 'book_hotel.html', {
             'hotel': hotel,
             'rooms': rooms,
-            'user': user
+            'user': user,
+            'personal_info': personal_info
         })
+    
+def create_booking(request):
+    if request.method == 'POST':
+        username = request.user.username
+        email = request.POST['email']
+        age = request.POST['age']
+        shipping_address = request.POST['shipping-address']
+        billing_address = request.POST['billing-address']
+        BRD = request.POST['BRD']
+        id_document = request.POST['id-document']
+        hotel_id = request.POST['hotel_id']
+        room_id = request.POST['room_id']
+        check_in_date = request.POST['check_in_date']
+        check_out_date = request.POST['check_out_date']
+        booking_status = request.POST['booking_status']
+
+        personal_info = Personal_data.objects.get(username=username)
+        personal_info.email = email
+        personal_info.shipping_address = shipping_address
+        personal_info.billing_address = billing_address
+        personal_info.business_registration_number = BRD
+        personal_info.age = age
+        personal_info.id_document = id_document
+        personal_info.save()
+
+        booking_record = Booking.objects.create(username=username, hotel_id=hotel_id, room_id=room_id, booking_status=booking_status, check_in_date=check_in_date, check_out_date=check_out_date)
+        booking_record.save()
+        return redirect('index')

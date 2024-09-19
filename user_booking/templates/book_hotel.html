@@ -88,13 +88,9 @@
           <nav id="navmenu" class="navmenu">
             <ul>
               <li>
-                <a href="#hero">Home<br /></a>
+                <a href="{% url 'index' %}">Home<br /></a>
               </li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#services">Services</a></li>
-              <li><a href="#portfolio">Portfolio</a></li>
-              <li><a href="#team">Team</a></li>
-              <li><a href="blog.html">Blog</a></li>
+
               <li class="dropdown">
                 <a href="#"
                   ><span>Dropdown</span>
@@ -120,7 +116,6 @@
                   <li><a href="#">Dropdown 4</a></li>
                 </ul>
               </li>
-              <li><a href="#contact">Contact</a></li>
             </ul>
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
           </nav>
@@ -129,6 +124,7 @@
     </header>
 
     <main class="main">
+      
       <!-- Page Title -->
       <div class="page-title">
         <div class="heading">
@@ -136,12 +132,6 @@
             <div class="row d-flex justify-content-center text-center">
               <div class="col-lg-8">
                 <h1>Book a Room at {{ hotel.hotel_name }}</h1>
-                <p class="mb-0">
-                  Odio et unde deleniti. Deserunt numquam exercitationem.
-                  Officiis quo odio sint voluptas consequatur ut a odio
-                  voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi
-                  ratione sint. Sit quaerat ipsum dolorem.
-                </p>
               </div>
             </div>
           </div>
@@ -150,76 +140,170 @@
           <div class="container">
             <ol>
               <li><a href="index.html">Home</a></li>
-              <li class="current">Starter Page</li>
+              <li class="current">Book Hotel</li>
             </ol>
           </div>
         </nav>
       </div>
       <!-- End Page Title -->
+      <section id="contact" class="contact section">
 
-      <div class="container">
-        <!-- Hotel Details -->
-        <div class="hotel-details">
-          <p><strong>Hotel Name:</strong> {{ hotel.hotel_name }}</p>
-          <p><strong>Hotel Address:</strong> {{ hotel.address }}</p>
-          <p><strong>Rate:</strong> {{ hotel.rate }}</p>
-          <p>
-            <strong>Supplier contract name:</strong> {{ hotel.supplier_contract_name }}
-          </p>
-          <p>
-            <strong>Contact phone_ umber:</strong> {{ hotel.contact_phone_number }}
-          </p>
-          <p><strong>Hotel url:</strong> {{ hotel.hotel_url }}</p>
+        <!-- Section Title -->
+  
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+  
+          <div class="row gx-lg-0 gy-4">
+  
+            <div class="col-lg-4">
+              <div class="info-container d-flex flex-column align-items-center justify-content-center">
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
+                  <i class="bi bi-geo-alt flex-shrink-0"></i>
+                  <div>
+                    <h3>Hotel Name</h3>
+                    <p>{{ hotel.hotel_name }}</p>
+                  </div>
+                </div><!-- End Info Item -->
+  
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+                  <i class="bi bi-telephone flex-shrink-0"></i>
+                  <div>
+                    <h3>Hotel Address</h3>
+                    <p>{{ hotel.address }}</p>
+                  </div>
+                </div><!-- End Info Item -->
+  
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+                  <i class="bi bi-envelope flex-shrink-0"></i>
+                  <div>
+                    <h3>Rate</h3>
+                    <p>{{ hotel.rate }}</p>
+                  </div>
+                </div><!-- End Info Item -->
+  
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="500">
+                  <i class="bi bi-clock flex-shrink-0"></i>
+                  <div>
+                    <h3>Supplier contract name</h3>
+                    <p>{{ hotel.supplier_contract_name }}</p>
+                  </div>
+                </div><!-- End Info Item -->
+
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="500">
+                  <i class="bi bi-clock flex-shrink-0"></i>
+                  <div>
+                    <h3>Contact phone number</h3>
+                    <p> {{ hotel.contact_phone_number }}</p>
+                  </div>
+                </div><!-- End Info Item -->
+
+                <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="500">
+                  <i class="bi bi-clock flex-shrink-0"></i>
+                  <div>
+                    <h3>Hotel url</h3>
+                    <p>{{ hotel.hotel_url }}</p>
+                  </div>
+                </div><!-- End Info Item -->
+              </div>
+  
+            </div>
+  
+            <div class="col-lg-8">
+              <form method="POST" action="{% url 'create_booking' %}">
+                {% csrf_token %}
+                <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+                <div class="row gy-4">
+  
+                  <div class="col-md-6">
+                    <input type="text" name="name" class="form-control" placeholder="Your Name" required="" value='{{ personal_info.username }}'>
+                  </div>
+  
+                  <div class="col-md-6 ">
+                    <input type="email" class="form-control" name="email" placeholder="Your email" required="" value='{{ personal_info.email }}'>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" name="age" class="form-control" placeholder="Your age" required="" value='{{ personal_info.age }}'>
+                  </div>
+  
+                  <div class="col-md-6 ">
+                    <input type="text" class="form-control" name="phone" placeholder="Your phone number" required="" value='{{ personal_info.phone_number }}'>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" name="shipping-address" class="form-control" placeholder="Your shipping address" required="" value='{{ personal_info.shipping_address }}'>
+                  </div>
+  
+                  <div class="col-md-6 ">
+                    <input type="text" class="form-control" name="billing-address" placeholder="Your billing address" required="" value='{{ personal_info.billing_address }}'>
+                  </div>
+  
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="BRD" placeholder="Your business registration number" required="" value='{{ personal_info.business_registration_number }}'>
+                  </div>
+                  <div class="col-md-6 ">
+                    <input type="text" class="form-control" name="id-document" placeholder="Your id document" required="" value='{{ personal_info.id_document }}'>
+                  </div>
+  
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="id-document-number" placeholder="Your id document number" required="" value='{{ personal_info.id_document_number }}'>
+                  </div>
+  
+                  <div class="col-md-12">
+                    <label for="room_id">Select Room:</label>
+                    <select name="room_id" id="room_id" class="form-control" required>
+                      <option value="" disabled selected>Select a room</option>
+                      <!-- Assuming you are fetching the room types in some way -->
+                      {% for room in rooms %}
+                      <option value="{{ room.room_id }}">
+                        {{ room.room_type }} - ${{ room.price }}
+                      </option>
+                      {% endfor %}
+                      <!-- You should replace this with dynamic room data -->
+                    </select>
+                  </div>
+                  <div class="col-md-12">
+                    <label for="check_in_date">Check-in Date:</label>
+                    <input
+                      type="date"
+                      name="check_in_date"
+                      id="check_in_date"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  
+                  <div class="col-md-12">
+                    <label for="check_out_date">Check-out Date:</label>
+                    <input
+                      type="date"
+                      name="check_out_date"
+                      id="check_out_date"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="booking_status">Booking Status:</label>
+                    <select name="booking_status" id="booking_status" class="form-control" required>
+                      <option value="confirmed">Confirm Booking</option>
+                      <option value="onhold">Hold Booking</option>
+                    </select>
+                  </div>
+                  <br>
+  
+                  <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary">Submit booking form</button>
+                  </div>
+                
+                </div>
+              </form>
+            </div><!-- End Contact Form -->
+  
+          </div>
+  
         </div>
-
-        <!-- Room Selection Form -->
-        <form method="POST" action="{% url 'book_hotel' %}">
-          {% csrf_token %}
-          <div>
-            <label for="room_id">Select Room:</label>
-            <select name="room_id" id="room_id" required>
-              <option value="" disabled selected>Select a room</option>
-              <!-- Assuming you are fetching the room types in some way -->
-              {% for room in rooms %}
-              <option value="{{ room.room_id }}]">
-                {{ room.room_type }} - ${{ room.price }}
-              </option>
-              {% endfor %}
-              <!-- You should replace this with dynamic room data -->
-            </select>
-          </div>
-
-          <div>
-            <label for="check_in_date">Check-in Date:</label>
-            <input
-              type="date"
-              name="check_in_date"
-              id="check_in_date"
-              required
-            />
-          </div>
-
-          <div>
-            <label for="check_out_date">Check-out Date:</label>
-            <input
-              type="date"
-              name="check_out_date"
-              id="check_out_date"
-              required
-            />
-          </div>
-
-          <div>
-            <label for="booking_status">Booking Status:</label>
-            <select name="booking_status" id="booking_status" required>
-              <option value="confirmed">Confirm Booking</option>
-              <option value="onhold">Hold Booking</option>
-            </select>
-          </div>
-
-          <button type="submit">Submit Booking</button>
-        </form>
-      </div>
+  
+      </section><!-- /Contact Section -->
+      
+      
     </main>
 
     <footer id="footer" class="footer accent-background">

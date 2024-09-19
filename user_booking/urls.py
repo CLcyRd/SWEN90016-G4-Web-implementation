@@ -10,4 +10,5 @@ urlpatterns = [
     path('personal_info/', views.personal_info, name='personal_info'),
     path('upload/', views.upload_hotel_csv, name='upload_hotel_csv'),
     path('book_hotel/', views.book_hotel, name='book_hotel'),
+    path('create_booking/', views.create_booking, name='create_booking'),
 ]

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 # Create your models here.
 class Phone(models.Model):
@@ -42,9 +43,12 @@ class Personal_data(models.Model):
         return f"{self.username}"
     
 class Booking(models.Model):
+    booking_id = models.AutoField(primary_key=True, editable=False)
     username = models.CharField(max_length=20)
     hotel_id = models.IntegerField()
     room_id = models.IntegerField()
+    check_in_date = models.DateField(default=datetime.date.today)
+    check_out_date = models.DateField(default=datetime.date.today)
     booking_status = models.CharField(max_length=20)
 
     def __str__(self):
