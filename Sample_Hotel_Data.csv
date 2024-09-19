@@ -1,0 +1,6 @@
+hotel_id,room_id,room_type,hotel_name,rate,supplier_contract_name,contact_phone_number,business_registration_number,hotel_url,price,meal_plan
+1,101,Single,Hotel A,100,Supplier A,1234567890,BRN123,http://hotelA.com,300,Breakfast
+2,102,Double,Hotel B,150,Supplier B,0987654321,BRN456,http://hotelB.com,400,Full board
+3,103,Suite,Hotel C,200,Supplier C,1122334455,BRN789,http://hotelC.com,500,Half board
+4,104,Single,Hotel D,120,Supplier D,2233445566,BRN101,http://hotelD.com,350,Breakfast
+5,105,Double,Hotel E,180,Supplier E,3344556677,BRN102,http://hotelE.com,450,Full board

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel List</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/styles.css' %}">
+
+    <script>
+        // JavaScript function to filter the hotels
+        function filterHotels() {
+            const hotelNameFilter = document.getElementById("hotelName").value.toLowerCase();
+            const addressFilter = document.getElementById("address").value.toLowerCase();
+            const minRate = parseInt(document.getElementById("minRate").value) || 0;
+            const maxRate = parseInt(document.getElementById("maxRate").value) || Infinity;
+            const minPrice = parseInt(document.getElementById("minPrice").value) || 0;
+            const maxPrice = parseInt(document.getElementById("maxPrice").value) || Infinity;
+
+            const hotels = document.getElementsByClassName("hotel-item");
+
+            for (let i = 0; i < hotels.length; i++) {
+                const hotelName = hotels[i].getAttribute("data-name").toLowerCase();
+                const hotelRate = parseInt(hotels[i].getAttribute("data-rate"));
+                const hotelPrice = parseInt(hotels[i].getAttribute("data-price"));
+                const hotelAddress = hotels[i].getAttribute("data-address").toLowerCase();
+
+                if (hotelName.includes(hotelNameFilter) &&
+                    hotelAddress.includes(addressFilter) &&
+                    hotelRate >= minRate && hotelRate <= maxRate &&
+                    hotelPrice >= minPrice && hotelPrice <= maxPrice) {
+                    hotels[i].style.display = "block";  // Show the hotel
+                } else {
+                    hotels[i].style.display = "none";   // Hide the hotel
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel List</h1>
+
+        <!-- Search and Filter Form (No submit button, handled in JS) -->
+        <form oninput="filterHotels()">
+            <input type="text" id="hotelName" placeholder="Search by hotel name">
+            <input type="text" id="address" placeholder="Search by address">
+            
+            <input type="number" id="minRate" placeholder="Min rate">
+            <input type="number" id="maxRate" placeholder="Max rate">
+            
+            <input type="number" id="minPrice" placeholder="Min price">
+            <input type="number" id="maxPrice" placeholder="Max price">
+        </form>
+
+        <!-- Hotel Listings -->
+        <div class="row">
+            {% for hotel in hotels %}
+                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app hotel-item"
+                     data-name="{{ hotel.hotel_name }}" 
+                     data-rate="{{ hotel.rate }}"
+                     data-price="{{ hotel.price }}"
+                     data-address="{{ hotel.address }}">
+                     
+                    <div class="portfolio-content h-100">
+                        <a href="{% static 'assets/img/portfolio/app-1.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox">
+                            <img src="{% static 'assets/img/portfolio/app-1.jpg' %}" class="img-fluid" alt="">
+                        </a>
+
+                        <div class="portfolio-info">
+                            <h4><a href="#" title="More Details">{{ hotel.hotel_name }}</a></h4>
+                            <h5>{{ hotel.room_type }}</h5>
+                            <p>{{ hotel.address }}</p>  <!-- Display hotel address -->
+                            <p>{{ hotel.price }}</p>
+                            <b>{{ hotel.rate }}</b>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</body>
+</html>
