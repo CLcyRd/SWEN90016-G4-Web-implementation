@@ -43,13 +43,30 @@ class Personal_data(models.Model):
         return f"{self.username}"
     
 class Booking(models.Model):
-    booking_id = models.AutoField(primary_key=True, editable=False)
-    username = models.CharField(max_length=20)
-    hotel_id = models.IntegerField()
-    room_id = models.IntegerField()
-    check_in_date = models.DateField(default=datetime.date.today)
-    check_out_date = models.DateField(default=datetime.date.today)
-    booking_status = models.CharField(max_length=20)
 
+    # a list of tuples of possible choices for the booking_status field.
+    BOOKING_STATUS_CHOICES = [
+        ('CONFIRMED', 'Confirmed'),
+        ('ONHOLD', 'On Hold'),
+        ('CANCELLED', 'Cancelled'),
+        ('RELEASED', 'Released')
+    ]
+    # automatically increments 
+    booking_id = models.AutoField(primary_key=True, editable=False)
+    # user
+    username = models.CharField(max_length=20)
+    # hotelid
+    hotel_id = models.IntegerField()
+    # room id
+    room_id = models.IntegerField()
+    # check in
+    check_in_date = models.DateField(default=datetime.date.today)
+    # check out
+    check_out_date = models.DateField(default=datetime.date.today)
+    # 
+    booking_status = models.CharField(max_length=20)
+    ''' my implementation '''
+    creation_date = models.DateTimeField(auto_now_add=True)
+# string representation
     def __str__(self):
         return f"{self.username} - {self.hotel_id}"
