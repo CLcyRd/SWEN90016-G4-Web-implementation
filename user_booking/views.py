@@ -26,13 +26,24 @@ def user_login(request):
     else:
         return render(request, 'login.html')
 
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.contrib.auth.models import User
+
 def sign_up(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        
         email = request.POST['email']
+
+        # 检查用户名是否已经存在
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists. Please choose a different username.")
+            return redirect('sign_up')  # 重定向到注册页面，让用户重新输入
+
+        # 创建用户
         user = User.objects.create_user(username=username, email=email, password=password)
+        
         if user is not None:
             phone_number = request.POST['phone']
             age = request.POST['age']
@@ -41,22 +52,34 @@ def sign_up(request):
             business_registration_number = request.POST['business_registration_number']
             id_document = request.POST['id_document']
             id_document_number = request.POST['id_document_number']
+
+            # 保存用户详细信息到 Personal_data 表
             personal_data = Personal_data.objects.create(
-                    username = username,
-                    age = age,
-                    email =email,
-                    shipping_address = shipping_address,
-                    billing_address = billing_address,
-                    phone_number = phone_number,
-                    business_registration_number = business_registration_number,
-                    id_document = id_document,
-                    id_document_number = id_document_number
+                username=username,
+                age=age,
+                email=email,
+                shipping_address=shipping_address,
+                billing_address=billing_address,
+                phone_number=phone_number,
+                business_registration_number=business_registration_number,
+                id_document=id_document,
+                id_document_number=id_document_number
             )
             personal_data.save()
-            login(request, user)
+
+            # 发送欢迎邮件
+            send_mail(
+                'Welcome to Our Service!',
+                f'Hello {username}, welcome to our platform. We are happy to have you on board!',
+                'admin@hotelbooking.com',  # 发件人
+                [email],  # 收件人是用户注册时输入的邮箱
+                fail_silently=False,
+            )
+
+            login(request, user)  # 登录用户
             return redirect('index')
     else:
-        return redirect('user_login')
+        return render(request, 'login.html')  # 如果是 GET 请求，返回登录页面
 
 @login_required
 def personal_info(request):
@@ -130,6 +153,8 @@ def book_hotel(request):
             'personal_info': personal_info
         })
     
+from django.core.mail import send_mail
+
 def create_booking(request):
     if request.method == 'POST':
         username = request.user.username
@@ -154,9 +179,29 @@ def create_booking(request):
         personal_info.id_document = id_document
         personal_info.save()
 
-        booking_record = Booking.objects.create(username=username, hotel_id=hotel_id, room_id=room_id, booking_status=booking_status, check_in_date=check_in_date, check_out_date=check_out_date)
+        booking_record = Booking.objects.create(
+            username=username, 
+            hotel_id=hotel_id, 
+            room_id=room_id, 
+            booking_status=booking_status, 
+            check_in_date=check_in_date, 
+            check_out_date=check_out_date
+        )
         booking_record.save()
+
+        # 发送确认邮件
+        send_mail(
+            'Booking Confirmation',
+            f'Hi {username}, your booking for hotel {hotel_id} has been confirmed from {check_in_date} to {check_out_date}.',
+            'admin@hotelbooking.com',  # 发件人
+            [email],  # 收件人
+            fail_silently=False,
+        )
+
+        
+
         return redirect('index')
+    
 # display specific bookings    
 def booking_detail(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
