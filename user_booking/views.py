@@ -198,4 +198,11 @@ def create_booking(request):
             fail_silently=False,
         )
 
+        
+
         return redirect('index')
+    
+# display specific bookings    
+def booking_detail(request, pk):
+    booking = get_object_or_404(Booking, pk=pk)
+    return render(request, 'booking_detail.html', {'booking': booking})

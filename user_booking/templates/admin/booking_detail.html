@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Booking Details</h1>
+<table>
+    <tr>
+        <th>Booking ID:</th>
+        <td>{{ booking.booking_id }}</td>
+    </tr>
+    <tr>
+        <th>Username:</th>
+        <td>{{ booking.username }}</td>
+    </tr>
+    <tr>
+        <th>Hotel ID:</th>
+        <td>{{ booking.hotel_id }}</td>
+    </tr>
+    <tr>
+        <th>Room ID:</th>
+        <td>{{ booking.room_id }}</td>
+    </tr>
+    <tr>
+        <th>Check-in Date:</th>
+        <td>{{ booking.check_in_date }}</td>
+    </tr>
+    <tr>
+        <th>Check-out Date:</th>
+        <td>{{ booking.check_out_date }}</td>
+    </tr>
+    <tr>
+        <th>Status:</th>
+        <td>{{ booking.booking_status }}</td>
+    </tr>
+</table>
+{% endblock %}

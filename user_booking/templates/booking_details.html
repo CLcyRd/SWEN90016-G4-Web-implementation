@@ -1,0 +1,6 @@
+{% if booking.booking_status == "ONHOLD" %}
+    <a href="{% url 'confirm_booking' booking.pk %}">Confirm</a>
+    <a href="{% url 'release_booking' booking.pk %}">Release</a>
+{% elif booking.booking_status == "CONFIRMED" %}
+    <a href="{% url 'cancel_booking' booking.pk %}">Cancel</a>
+{% endif %}
