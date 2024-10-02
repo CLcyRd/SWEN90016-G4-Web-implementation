@@ -1,12 +1,13 @@
 from django.contrib import admin
-from .models import Phone, Hotel, Personal_data, Booking
+from .models import Phone, Hotel, Personal_data, Booking, Hotel_data, Room_data
 from django.utils.html import format_html
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404
 from django.urls import path  # Import the path function
 
-admin.site.register(Phone)
 admin.site.register(Hotel)
+admin.site.register(Hotel_data)
+admin.site.register(Room_data)
 admin.site.register(Personal_data)
 # admin.site.register(Booking)
 

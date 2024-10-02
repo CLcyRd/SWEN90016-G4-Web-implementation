@@ -1,0 +1,4 @@
+hotel_name,room_type,rate,supplier_contract_name,contact_phone_number,business_registration_number,hotel_url,price,meal_plan,address
+Grand Hotel,Single,5,Supplier A,1234567890,BRN001,http://grandhotel.com,100,Breakfast,123 Main St
+City Lodge,Double,4,Supplier B,0987654321,BRN002,http://citylodge.com,150,Half Board,456 City Rd
+Ocean View,Suite,3,Supplier C,5555555555,BRN003,http://oceanview.com,200,Full Board,789 Ocean Ave

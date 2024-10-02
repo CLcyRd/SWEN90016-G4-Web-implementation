@@ -2,15 +2,43 @@ from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from user_booking.models import Phone, Hotel, Personal_data, Booking
+from user_booking.models import Phone, Hotel, Personal_data, Booking, Hotel_data, Room_data
 from user_booking.form import CSVUploadForm
 import csv
+import pandas
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.db import IntegrityError
 
 # Create your views here.
 def index(request):
-    hotels = Hotel.objects.all()
-    return render(request, 'index.html', {'hotels': hotels})
+    # Fetch all hotel data
+    hotels = Hotel_data.objects.all()
+    hotel_room_data = []
+
+    for hotel in hotels:
+        # Fetch the corresponding room data for each hotel
+        rooms = Room_data.objects.filter(hotel_id=hotel.hotel_id)
+
+        # Combine hotel and room data
+        for room in rooms:
+            hotel_room_data.append({
+                'hotel_id': hotel.hotel_id,
+                'hotel_name': hotel.hotel_name,
+                'room_type': room.room_type,
+                'rate': hotel.rate,
+                'supplier_contract_name': hotel.supplier_contract_name,
+                'contact_phone_number': hotel.contact_phone_number,
+                'business_registration_number': hotel.business_registration_number,
+                'hotel_url': hotel.hotel_url,
+                'price': room.price,
+                'meal_plan': hotel.meal_plan,
+                'address': hotel.address,
+            })
+
+    return render(request, 'index.html', {'hotels': hotel_room_data})
 
 def user_login(request):
     if request.method == 'POST':
@@ -25,10 +53,7 @@ def user_login(request):
             return redirect('user_login')
     else:
         return render(request, 'login.html')
-
-from django.core.mail import send_mail
-from django.contrib import messages
-from django.contrib.auth.models import User
+    
 
 def sign_up(request):
     if request.method == 'POST':
@@ -106,30 +131,46 @@ def upload_hotel_csv(request):
             if not csv_file.name.endswith('.csv'):
                 messages.error(request, 'This is not a CSV file.')
             else:
-                decoded_file = csv_file.read().decode('utf-8').splitlines()
-                reader = csv.reader(decoded_file)
-                next(reader)  # Skip the header row
-                for row in reader:
-                    try:
-                        Hotel.objects.create(
-                            hotel_id=row[0],
-                            room_id=row[1],
-                            room_type=row[2],
-                            hotel_name=row[3],
-                            rate=row[4],
-                            supplier_contract_name=row[5],
-                            contact_phone_number=row[6],
-                            business_registration_number=row[7],
-                            hotel_url=row[8],
-                            price=row[9],
-                            meal_plan=row[10]
-                        )
-                    except IndexError:
-                        messages.error(request, f"Error in row: {row}. Please check your CSV formatting.")
-                    except Exception as e:
-                        messages.error(request, f"An error occurred: {str(e)}")
-                        
-                messages.success(request, 'Data uploaded successfully!')
+                try:
+                    df = pandas.read_csv(csv_file)
+                    errors = []
+                    
+                    for index, row in df.iterrows():
+                        # Check if the hotel with the same name already exists
+                        if Hotel_data.objects.filter(hotel_name=row['hotel_name']).exists():
+                            errors.append(f"Hotel '{row['hotel_name']}' already exists.")
+                        else:
+                            # Create the hotel data
+                            hotel = Hotel_data.objects.create(
+                                hotel_name=row['hotel_name'],
+                                rate=row['rate'],
+                                supplier_contract_name=row['supplier_contract_name'],
+                                contact_phone_number=row['contact_phone_number'],
+                                business_registration_number=row['business_registration_number'],
+                                hotel_url=row['hotel_url'],
+                                meal_plan=row['meal_plan'],
+                                address=row['address']
+                            )
+
+                            # Create the room data
+                            try:
+                                Room_data.objects.create(
+                                    hotel_id=hotel.hotel_id,
+                                    room_type=row['room_type'],
+                                    price=row['price'],
+                                    inventory=0  # Assuming inventory is 0 in this example
+                                )
+                            except IntegrityError:
+                                errors.append(f"Room '{row['room_type']}' for Hotel '{row['hotel_name']}' already exists.")
+
+
+                    if errors:
+                        return render(request, 'import.html', {'form': form, 'errors': errors})
+
+                    return redirect('success')  # Redirect to a success page
+                except Exception as e:
+                    print(e)
+                    return render(request, 'import.html', {'form': form, 'error': str(e)})
     else:
         form = CSVUploadForm()
 
@@ -139,13 +180,21 @@ def upload_hotel_csv(request):
 def book_hotel(request):
     if request.method == "GET":
         hotel_id = request.GET.get('hotel_id')
-        rooms = Hotel.objects.filter(hotel_id=hotel_id)
-        hotel = rooms[0]
-        user = request.user  # Get the logged-in user
+        
+        # Get the hotel details from Hotel_data model
+        hotel = get_object_or_404(Hotel_data, hotel_id=hotel_id)
+        
+        # Get the available rooms for the hotel from Room_data model
+        rooms = Room_data.objects.filter(hotel_id=hotel_id)
+        
+        # Get the current logged-in user
+        user = request.user  
         username = user.username
-        personal_info = Personal_data.objects.get(username=username)
-        if personal_info is None:
-            return render(request, 'book_hotel.html', {'hotel': hotel,'rooms': rooms,'user': user,})
+        
+        # Get the personal information of the logged-in user
+        personal_info = Personal_data.objects.filter(username=username).first()
+        
+        # Pass the hotel, rooms, and user data to the template
         return render(request, 'book_hotel.html', {
             'hotel': hotel,
             'rooms': rooms,

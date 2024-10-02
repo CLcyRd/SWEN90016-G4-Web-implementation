@@ -28,6 +28,35 @@ class Hotel(models.Model):
     def __str__(self):
         return f"{self.hotel_name} - {self.room_type}"
     
+class Hotel_data(models.Model):
+    hotel_id = models.AutoField(primary_key=True)
+    hotel_name = models.CharField(max_length=100, unique=True)
+    rate = models.IntegerField()
+    supplier_contract_name = models.CharField(max_length=100)
+    contact_phone_number = models.CharField(max_length=15)
+    business_registration_number = models.CharField(max_length=100)
+    hotel_url = models.URLField()
+    meal_plan = models.CharField(max_length=100)
+    address = models.CharField(max_length=255, default="melbourne")  # Add an address field
+
+    def __str__(self):
+        return f"{self.hotel_id} - {self.hotel_name}"
+    
+class Room_data(models.Model):
+    room_id = models.AutoField(primary_key=True)
+    hotel_id = models.IntegerField()
+    room_type = models.CharField(max_length=40)
+    inventory = models.IntegerField(default=0)
+    price = models.IntegerField()
+    room_image = models.ImageField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('hotel_id', 'room_type')
+    
+    def __str__(self):
+        return f"{self.room_id} - {self.room_type}"
+
+    
 class Personal_data(models.Model):
     username = models.CharField(max_length=20)
     age = models.IntegerField(default=18)
