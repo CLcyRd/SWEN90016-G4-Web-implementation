@@ -157,3 +157,7 @@ def create_booking(request):
         booking_record = Booking.objects.create(username=username, hotel_id=hotel_id, room_id=room_id, booking_status=booking_status, check_in_date=check_in_date, check_out_date=check_out_date)
         booking_record.save()
         return redirect('index')
+# display specific bookings    
+def booking_detail(request, pk):
+    booking = get_object_or_404(Booking, pk=pk)
+    return render(request, 'booking_detail.html', {'booking': booking})
