@@ -36,6 +36,7 @@ def index(request):
                 'price': room.price,
                 'meal_plan': hotel.meal_plan,
                 'address': hotel.address,
+                'room_image': room.room_image,
             })
 
     return render(request, 'index.html', {'hotels': hotel_room_data})

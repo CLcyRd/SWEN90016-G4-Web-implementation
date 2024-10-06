@@ -48,7 +48,7 @@ class Room_data(models.Model):
     room_type = models.CharField(max_length=40)
     inventory = models.IntegerField(default=0)
     price = models.IntegerField()
-    room_image = models.ImageField(blank=True, null=True)
+    room_image = models.ImageField(upload_to='rooms/', blank=True, null=True)
 
     class Meta:
         unique_together = ('hotel_id', 'room_type')

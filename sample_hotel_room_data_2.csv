@@ -1,0 +1,4 @@
+hotel_name,room_type,rate,supplier_contract_name,contact_phone_number,business_registration_number,hotel_url,price,meal_plan,address
+Sunrise Hotel,Single,4,Supplier X,1112223333,BRN004,http://sunrisehotel.com,120,Breakfast,321 Sunrise Blvd
+Mountain Retreat,Double,5,Supplier Y,4445556666,BRN005,http://mountainretreat.com,180,Full Board,654 Mountain Rd
+Lakeside Inn,Suite,3,Supplier Z,7778889999,BRN006,http://lakesideinn.com,250,Half Board,987 Lakeside St

@@ -337,8 +337,8 @@
                  data-address="{{ hotel.address }}">
                  
                 <div class="portfolio-content h-100">
-                    <a href="{% static 'assets/img/portfolio/app-1.jpg' %}" data-gallery="portfolio-gallery-app" class="glightbox">
-                        <img src="{% static 'assets/img/cta-bg.jpg' %}" class="img-fluid" alt="">
+                    <a href="{% if hotel.room_image %}{{ hotel.room_image.url }}{% else %}{% static 'assets/img/cta-bg.jpg' %}{% endif %}" data-gallery="portfolio-gallery-app" class="glightbox">
+                        <img src="{% if hotel.room_image %}{{ hotel.room_image.url }}{% else %}{% static 'assets/img/cta-bg.jpg' %}{% endif %}" class="img-fluid" alt="">
                     </a>
 
                     <div class="portfolio-info">

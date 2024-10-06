@@ -78,7 +78,7 @@
         <div
           class="container position-relative d-flex align-items-center justify-content-between"
         >
-          <a href="index.html" class="logo d-flex align-items-center">
+          <a href="{% url 'index' %}" class="logo d-flex align-items-center">
             <!-- Uncomment the line below if you also wish to use an image logo -->
             <!-- <img src="assets/img/logo.png" alt=""> -->
             <h1 class="sitename">OZ Epic</h1>
@@ -86,7 +86,6 @@
           </a>
 
           <nav id="navmenu" class="navmenu">
-
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
           </nav>
         </div>
@@ -114,7 +113,7 @@
         <nav class="breadcrumbs">
           <div class="container">
             <ol>
-              <li><a href="index.html">Home</a></li>
+              <li><a href="{% url 'index' %}">Home</a></li>
               <li class="current">user login</li>
             </ol>
           </div>
@@ -131,8 +130,8 @@
                 <form action="{% url 'sign_up' %}" method="POST">
                   {% csrf_token %}
                   <h4>Create a new account</h4>
-                  <br>
-                  <br>
+                  <br />
+                  <br />
                   <div class="row">
                     <div class="col-md-6 form-group">
                       <input
@@ -161,38 +160,69 @@
                       />
                     </div>
                     <div class="col-md-6 form-group">
-                      <input name="phone" type="number" class="form-control" placeholder="Your Phone Number"/>
-                    </div>
-                    
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6 form-group">
-                      <input name="age" type="number" class="form-control" placeholder="Your age"
-                      />
-                    </div>
-                    <div class="col-md-6 form-group">
-                      <input name="shipping_address" type="text" class="form-control" placeholder="Your shipping address"/>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-md-6 form-group">
-                      <input name="billing_address" type="text" class="form-control" placeholder="Your billing address"/>
-                    </div>
-                    <div class="col-md-6 form-group">
-                      <input name="business_registration_number" type="number" class="form-control" placeholder="Your business registration number"
+                      <input
+                        name="phone"
+                        type="number"
+                        class="form-control"
+                        placeholder="Your Phone Number"
                       />
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-md-6 form-group">
-                      <input name="id_document" type="text" class="form-control" placeholder="Your id document"
+                      <input
+                        name="age"
+                        type="number"
+                        class="form-control"
+                        placeholder="Your age"
                       />
                     </div>
                     <div class="col-md-6 form-group">
-                      <input name="id_document_number" type="number" class="form-control" placeholder="Your id document number"/>
+                      <input
+                        name="shipping_address"
+                        type="text"
+                        class="form-control"
+                        placeholder="Your shipping address"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <input
+                        name="billing_address"
+                        type="text"
+                        class="form-control"
+                        placeholder="Your billing address"
+                      />
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <input
+                        name="business_registration_number"
+                        type="number"
+                        class="form-control"
+                        placeholder="Your business registration number"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <input
+                        name="id_document"
+                        type="text"
+                        class="form-control"
+                        placeholder="Your id document"
+                      />
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <input
+                        name="id_document_number"
+                        type="number"
+                        class="form-control"
+                        placeholder="Your id document number"
+                      />
                     </div>
                   </div>
 
@@ -213,8 +243,8 @@
                 <form action="{% url 'user_login' %}" method="POST">
                   {% csrf_token %}
                   <h4>Login your account</h4>
-                  <br>
-                  <br>
+                  <br />
+                  <br />
                   <div class="row">
                     <div class="col-md-12 form-group">
                       <input
@@ -237,14 +267,12 @@
                   </div>
 
                   <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Log in</button>
+                    <button type="submit" class="btn btn-primary">
+                      Log in
+                    </button>
                   </div>
-                  {% if messages %}
-                  <br>
-                    {% for message in messages %}
-                      {{ message }}
-                    {% endfor %}
-                  {% endif %}
+                  <!--        <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a> -->
+
                 </form>
               </div>
             </section>
