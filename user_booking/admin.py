@@ -4,6 +4,8 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404
 from django.urls import path  # Import the path function
+from django.template.loader import render_to_string 
+from django.core.mail import EmailMultiAlternatives
 
 admin.site.register(Hotel)
 admin.site.register(Hotel_data)
@@ -19,8 +21,43 @@ def release_bookings(modeladmin, request, queryset):
     # Filter to only apply to bookings with ONHOLD status
     queryset = queryset.filter(booking_status='ONHOLD')
     if queryset.exists():
-        updated = queryset.update(booking_status='RELEASED')
-        modeladmin.message_user(request, f"{updated} bookings were successfully released.")
+        updated = queryset.update(booking_status='RELEASED')    
+    #    modeladmin.message_user(request, f"{updated} bookings were successfully released.")
+    #else:
+    #    modeladmin.message_user(request, "No ONHOLD bookings selected.", level=messages.WARNING)
+        for booking in queryset:
+            username = booking.username
+            print(username)
+            room_id = booking.room_id
+            print(room_id)
+            user = Personal_data.objects.get(username=username)
+            print(user)
+            email = user.email
+            room = Hotel.objects.get(room_id=room_id)
+            room_price = room.room_price
+            gst = room_price * 0.10
+            total_paid = room_price + gst
+            hotel_name = booking.hotel_name
+            booking_status = "cancelled"  
+            subject = "Booking Status Notification"
+            from_email = "admin@hotelbooking.com"
+            to_email = [email]
+            context = {
+                'username': username,
+                'booking_status': booking_status,
+                'room_price': room_price,
+                'gst': gst,
+                'total_paid': total_paid,
+                'hotel_name': hotel_name
+            }   
+            # Render the email template
+            html_content = render_to_string('booking_status_email.html', context)
+            text_content = f"Your booking has been {booking_status}. Hotel name: ${hotel_name}, Room price: ${room_price}, GST: ${gst}, Total paid: ${total_paid}" 
+            email_msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
+
+        modeladmin.message_user(request, f"{updated} bookings were successfully released, and emails sent to users.")
     else:
         modeladmin.message_user(request, "No ONHOLD bookings selected.", level=messages.WARNING)
 # status of selected bookings from "ONHOLD" to "CONFIRMED" if they are in the "ONHOLD" status

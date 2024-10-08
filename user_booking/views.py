@@ -6,11 +6,17 @@ from user_booking.models import Phone, Hotel, Personal_data, Booking, Hotel_data
 from user_booking.form import CSVUploadForm
 import csv
 import pandas
+import requests
+import hotel_booking.settings as settings
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.http import JsonResponse, HttpResponse
+import django.template.loader
+from datetime import datetime, timedelta
+
 
 # Create your views here.
 def index(request):
@@ -46,11 +52,30 @@ def user_login(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
+        locked = request.session.get('lock_time')
+        failed_attempts = request.session.get('failed_attempts', 0)
+
+    
+        # Check if the user is currently locked out
+        if locked:
+            locked = datetime.fromtimestamp(locked)
+            if datetime.now() < locked:
+                minutes_left = (locked- datetime.now()).seconds // 60
+                messages.error(request, f"You have been locked out. Try again in {minutes_left} minute(s).")
+                return render(request, 'login.html')
+        if failed_attempts >= 5:
+                lock_time = datetime.now() + timedelta(minutes=10)
+                request.session['lock_time'] = lock_time.timestamp()
+                messages.error(request, "Too many failed attempts. Please try again after 10 minutes.")
+                failed_attempts = 0
+                return render(request, 'login.html')
         if user is not None:
             login(request, user)
             return redirect('index')
         else:
             messages.success(request, ("Invalid username or password, try again"))
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
             return redirect('user_login')
     else:
         return render(request, 'login.html')
@@ -61,12 +86,86 @@ def sign_up(request):
         username = request.POST['username']
         password = request.POST['password']
         email = request.POST['email']
+        otp = request.POST['verify']
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        locked = request.session.get('lock_time')
+        failed_attempts = request.session.get('failed_attempts', 0)
 
-        # 检查用户名是否已经存在
+    
+        # Check if the user is currently locked out
+        if locked:
+            locked = datetime.fromtimestamp(locked)
+            if datetime.now() < locked:
+                minutes_left = (locked- datetime.now()).seconds // 60
+                messages.error(request, f"You have been locked out. Try again in {minutes_left} minute(s).")
+                return render(request, 'login.html')
+            
+        if failed_attempts >= 5:
+                lock_time = datetime.now() + timedelta(minutes=10)
+                request.session['lock_time'] = lock_time.timestamp()
+                messages.error(request, "Too many failed attempts. Please try again after 10 minutes.")
+                failed_attempts = 0
+                return render(request, 'login.html')
+        
+        stored_otp = request.session.get('verify') 
+        otp_timestamp = request.session.get('otp_timestamp')
+        # Verify reCAPTCHA
+        recaptcha_validation = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': settings.RECAPTCHA_PRIVATE_KEY,  # Ensure RECAPTCHA_SECRET_KEY is in settings.py
+                'response': recaptcha_response
+            }
+        )
+
+        result = recaptcha_validation.json()
+        if not result.get('success'):
+            messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')
+        
+        # Check if already stored
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists. Please choose a different username.")
-            return redirect('sign_up')  # 重定向到注册页面，让用户重新输入
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists. Please use a different email.")
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')
+        # check whether the verification code is correct
+        
+        if stored_otp == None:
+            print('error1')
+            messages.error(request, "No verification code found. Please request a new one.")
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')
 
+        if otp != stored_otp:  # If OTP does not match
+            print('error2')
+            messages.error(request, "Verification code does not match. Please try again.")
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')  # Redirect back to the sign-up page
+        
+        if stored_otp is None or otp_timestamp is None:
+            messages.error(request, "No verification code found. Please request a new one.")
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')
+        
+        otp_time = datetime.fromtimestamp(otp_timestamp)
+        if datetime.now() > otp_time + timedelta(minutes=10):
+            messages.error(request, "The verification code has expired. Please request a new one.")
+            failed_attempts += 1  # Increment failed attempts
+            request.session['failed_attempts'] = failed_attempts
+            return render(request, 'login.html')
+        
         # 创建用户
         user = User.objects.create_user(username=username, email=email, password=password)
         
@@ -79,7 +178,7 @@ def sign_up(request):
             id_document = request.POST['id_document']
             id_document_number = request.POST['id_document_number']
 
-            # 保存用户详细信息到 Personal_data 表
+            # Store
             personal_data = Personal_data.objects.create(
                 username=username,
                 age=age,
@@ -92,20 +191,21 @@ def sign_up(request):
                 id_document_number=id_document_number
             )
             personal_data.save()
-
-            # 发送欢迎邮件
+            html_message = django.template.loader.render_to_string('welcome.html', {'username': username})
+            # Send email
             send_mail(
                 'Welcome to Our Service!',
-                f'Hello {username}, welcome to our platform. We are happy to have you on board!',
-                'admin@hotelbooking.com',  # 发件人
-                [email],  # 收件人是用户注册时输入的邮箱
+                '',
+                'admin@hotelbooking.com',  # admin emaiil
+                [email],
+                html_message=html_message,  # user email
                 fail_silently=False,
             )
-
-            login(request, user)  # 登录用户
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)  # login
             return redirect('index')
     else:
-        return render(request, 'login.html')  # 如果是 GET 请求，返回登录页面
+        return render(request, 'login.html')  # back to login
 
 @login_required
 def personal_info(request):
@@ -118,6 +218,7 @@ def personal_info(request):
         if user is not None:
             phone = Phone(username=username, phone_number=phone)
             phone.save()
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
             return redirect('index')
     else:
@@ -256,3 +357,71 @@ def create_booking(request):
 def booking_detail(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
     return render(request, 'booking_detail.html', {'booking': booking})
+
+
+def existUser(sendingEmail):
+    return (Personal_data.objects.filter(email=sendingEmail).exists() or User.objects.filter(email=sendingEmail).exists()) #Checks users OR superusers consider it fixed
+
+def reg(request):
+
+    response = {"state": False, "errmsg": "11111"} # set default response
+    email = request.POST.get('email')
+
+    if request.POST.get('type') == 'sendOTP':
+
+        csrf_token = request.POST.get('csrfmiddlewaretoken')
+        print("Received CSRF token:", csrf_token)
+
+        email = request.POST.get('email')
+
+        response = {"state": False, "errmsg": ""} # set default response
+
+        if existUser(email):
+            
+            response['state'] = False
+            response['errmsg'] = 'Email Exists! Log in please!'
+            print("Email Exists! Log in please!")
+
+        else:
+            try:
+                print(str(existUser(email)))
+                rand_str = sendMessage(request,email)  # Send email
+                request.session['verify'] = rand_str  # Store code into session
+                print(request.session['verify'])
+                response['state'] = True
+                print("Message Sent!")
+            except:
+                response['state'] = False
+                response['errmsg'] = 'Unable to send code, please check email'
+                print("Unable to send code, please check email")
+        
+        print("11111Email:", email)
+        return JsonResponse(response)
+    
+    print("22222Email:", email)
+    return JsonResponse(response)
+    
+
+def sendMessage(request,email):
+
+    # Generate verification code
+    import random
+    str1 = '0123456789'
+    rand_str = ''.join(random.choice(str1) for _ in range(6))
+
+    # Render the HTML email template
+    html_message = django.template.loader.render_to_string('email_template.html', {'code': rand_str})
+
+    # Send email
+    emailBox = [email]
+    send_mail(
+        'Your Verification Code',
+        '',  # Empty since we're using the HTML template
+        'your-email@example.com',
+        emailBox,
+        fail_silently=False,
+        html_message=html_message  # Sending the rendered HTML message
+    )
+    request.session['verify'] = rand_str
+    request.session['otp_timestamp'] = datetime.now().timestamp()
+    return rand_str

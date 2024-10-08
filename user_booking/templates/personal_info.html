@@ -67,7 +67,7 @@
 
         <nav id="navmenu" class="navmenu">
           <ul>
-            <li><a href="#hero">Home<br></a></li>
+            <li><a href="\">Home<br></a></li>
             {% if user.is_authenticated %}
             <li class="dropdown"><a href="#"><span>Account</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
@@ -82,7 +82,12 @@
                   </ul>
                 </li>
                 <li><a href="{% url 'personal_info' %}">Personal Information</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li>
+                  <form method="POST" action="{% url 'logout' %}" style="display: inline-block; width: 100%; margin: 0; padding: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown" style="width: 100%; text-align: left; padding: 10px 20px; background: none; border: none; color:#ac1c1c; font:Roboto; font-size: 16px; font-weight:500;">Log out</button>
+                  </form>
+                </li>
                 
               </ul>
             </li>
@@ -115,7 +120,7 @@
       <nav class="breadcrumbs">
         <div class="container">
           <ol>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="\">Home</a></li>
             <li class="current">Service Details</li>
           </ol>
         </div>
@@ -189,7 +194,7 @@
         <div class="col-lg-2 col-6 footer-links">
           <h4>Useful Links</h4>
           <ul>
-            <li><a href="#">Home</a></li>
+            <li><a href="\">Home</a></li>
             <li><a href="#">About us</a></li>
             <li><a href="#">Services</a></li>
             <li><a href="#">Terms of service</a></li>

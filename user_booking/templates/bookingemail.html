@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            width: 100%;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .email-header {
+            background-color: #008374;
+            padding: 20px;
+            color: #ffffff;
+            text-align: center;
+        }
+        .email-body {
+            padding: 20px;
+        }
+        .email-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #777777;
+        }
+        .email-body h2 {
+            color: #008374;
+        }
+        .email-body p {
+            font-size: 16px;
+        }
+        .email-body table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .email-body table th, .email-body table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #dddddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Booking Status</h1>
+        </div>
+        <div class="email-body">
+            <h2>Hello {{ username }},</h2>
+            <p>Your booking has been <strong>{{ booking_status }}</strong>.</p>
+
+            <h3>Booking Details:</h3>
+            <table>
+                <tr>
+                    <th>Hotel name</th>
+                    <td>${{ hotel_name }}</td>
+                </tr>
+                <tr>
+                    <th>Room Price</th>
+                    <td>${{ room_price }}</td>
+                </tr>
+                <tr>
+                    <th>GST (10%)</th>
+                    <td>${{ gst }}</td>
+                </tr>
+                <tr>
+                    <th>Total Amount Paid</th>
+                    <td>${{ total_paid }}</td>
+                </tr>
+            </table>
+
+            <p>We hope to see you soon. If you have any questions, please contact us at support@hotelbooking.com.</p>
+        </div>
+        <div class="email-footer">
+            <p>&copy; 2024 OZ Epic. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

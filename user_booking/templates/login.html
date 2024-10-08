@@ -7,6 +7,7 @@
     <meta name="description" content="" />
     <meta name="keywords" content="" />
     {% load static %}
+    
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon" />
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
@@ -41,6 +42,7 @@
     <!-- Main CSS File -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}" />
 
+    
     <!-- =======================================================
   * Template Name: Impact
   * Template URL: https://bootstrapmade.com/impact-bootstrap-business-website-template/
@@ -49,7 +51,7 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
   </head>
-
+  
   <body class="blog-details-page">
     <header id="header" class="header fixed-top">
       <div class="topbar d-flex align-items-center">
@@ -78,7 +80,7 @@
         <div
           class="container position-relative d-flex align-items-center justify-content-between"
         >
-          <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+          <a href="\" class="logo d-flex align-items-center">
             <!-- Uncomment the line below if you also wish to use an image logo -->
             <!-- <img src="assets/img/logo.png" alt=""> -->
             <h1 class="sitename">OZ Epic</h1>
@@ -86,6 +88,7 @@
           </a>
 
           <nav id="navmenu" class="navmenu">
+
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
           </nav>
         </div>
@@ -113,14 +116,20 @@
         <nav class="breadcrumbs">
           <div class="container">
             <ol>
-              <li><a href="{% url 'index' %}">Home</a></li>
-              <li class="current">user login</li>
+              <li><a href='\'>Home</a></li>
+              <li class="current">User login</li>
             </ol>
           </div>
         </nav>
       </div>
       <!-- End Page Title -->
-
+      {% if messages %}
+    <div class="alert alert-danger" role="alert">
+    {% for message in messages %}
+      {{ message }}
+    {% endfor %}
+  </div>
+{% endif %}
       <div class="container">
         <div class="row">
           <div class="col-lg-8">
@@ -130,8 +139,8 @@
                 <form action="{% url 'sign_up' %}" method="POST">
                   {% csrf_token %}
                   <h4>Create a new account</h4>
-                  <br />
-                  <br />
+                  <br>
+                  <br>
                   <div class="row">
                     <div class="col-md-6 form-group">
                       <input
@@ -160,78 +169,69 @@
                       />
                     </div>
                     <div class="col-md-6 form-group">
-                      <input
-                        name="phone"
-                        type="number"
-                        class="form-control"
-                        placeholder="Your Phone Number"
+                      <input name="phone" type="number" class="form-control" placeholder="Your Phone Number"/>
+                    </div>
+                    
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <input name="age" type="number" class="form-control" placeholder="Your age"
+                      />
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <input name="shipping_address" type="text" class="form-control" placeholder="Your shipping address"/>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <input name="billing_address" type="text" class="form-control" placeholder="Your billing address"/>
+                    </div>
+                    <div class="col-md-6 form-group">
+                      <input name="business_registration_number" type="number" class="form-control" placeholder="Your business registration number"
                       />
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-md-6 form-group">
-                      <input
-                        name="age"
-                        type="number"
-                        class="form-control"
-                        placeholder="Your age"
+                      <input name="id_document" type="text" class="form-control" placeholder="Your id document"
                       />
                     </div>
                     <div class="col-md-6 form-group">
-                      <input
-                        name="shipping_address"
-                        type="text"
-                        class="form-control"
-                        placeholder="Your shipping address"
-                      />
+                      <input name="id_document_number" type="number" class="form-control" placeholder="Your id document number"/>
                     </div>
                   </div>
 
-                  <div class="row">
-                    <div class="col-md-6 form-group">
-                      <input
-                        name="billing_address"
-                        type="text"
-                        class="form-control"
-                        placeholder="Your billing address"
-                      />
-                    </div>
-                    <div class="col-md-6 form-group">
-                      <input
-                        name="business_registration_number"
-                        type="number"
-                        class="form-control"
-                        placeholder="Your business registration number"
-                      />
+                  <!-- Verification Code input -->
+                  <div class="form-group">
+                    <label for="vertify" class="col-md-2 control-label">Verification code:</label>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" name="verify" id="verify" class="form-control" placeholder="Enter code">
+                            <span class="input-group-btn">
+                                <input type="button" id="sendEmail" class="btn btn-default" value="Send email">
+                            </span>
+                        </div>
                     </div>
                   </div>
-
-                  <div class="row">
-                    <div class="col-md-6 form-group">
-                      <input
-                        name="id_document"
-                        type="text"
-                        class="form-control"
-                        placeholder="Your id document"
-                      />
-                    </div>
-                    <div class="col-md-6 form-group">
-                      <input
-                        name="id_document_number"
-                        type="number"
-                        class="form-control"
-                        placeholder="Your id document number"
-                      />
-                    </div>
-                  </div>
-
+                  <div class="g-recaptcha" data-sitekey="6Ld6JFoqAAAAAK4wkuR_pZfloyzV53S-iMFn0F5h"></div>       
+              <script src="https://www.google.com/recaptcha/api.js" async defer></script>
                   <div class="text-center">
                     <button type="submit" class="btn btn-primary">
+                      
                       Sign up
                     </button>
                   </div>
                 </form>
+
+                <div id="messBox" style="display: none; position: fixed; width: 300px; height: 35px; top: 50%; left: 40%; z-index: 10; border-radius: 10%; background: color #8c8c8c; color: black; text-align: center;">
+                  <span id="errorMess" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+                      <!-- Error msg here -->
+                  </span>
+                </div>
+                
               </div>
             </section>
             <!-- /Comment Form Section -->
@@ -243,8 +243,8 @@
                 <form action="{% url 'user_login' %}" method="POST">
                   {% csrf_token %}
                   <h4>Login your account</h4>
-                  <br />
-                  <br />
+                  <br>
+                  <br>
                   <div class="row">
                     <div class="col-md-12 form-group">
                       <input
@@ -265,13 +265,9 @@
                       />
                     </div>
                   </div>
-
                   <div class="text-center">
-                    <button type="submit" class="btn btn-primary">
-                      Log in
-                    </button>
+                    <button type="submit" class="btn btn-primary">Log in</button>
                   </div>
-                  <!--        <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a> -->
 
                 </form>
               </div>
@@ -384,5 +380,9 @@
 
     <!-- Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
+
+    <!-- 在页面中引用新的JS文件 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'assets/js/formValidation.js' %}"></script>
   </body>
 </html>
