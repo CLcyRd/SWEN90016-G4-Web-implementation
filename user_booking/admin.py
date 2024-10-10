@@ -3,11 +3,10 @@ from .models import Phone, Hotel, Personal_data, Booking, Hotel_data, Room_data
 from django.utils.html import format_html
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404
-from django.urls import path  # Import the path function
+from django.urls import path
 from django.template.loader import render_to_string 
 from django.core.mail import EmailMultiAlternatives
 
-admin.site.register(Hotel)
 admin.site.register(Hotel_data)
 admin.site.register(Room_data)
 admin.site.register(Personal_data)
@@ -19,54 +18,88 @@ admin.site.register(Personal_data)
 # status of selected bookings from "ONHOLD" to "RELEASED" if they are in the "ONHOLD" status
 def release_bookings(modeladmin, request, queryset):
     # Filter to only apply to bookings with ONHOLD status
-    queryset = queryset.filter(booking_status='ONHOLD')
+    queryset = queryset.filter(booking_status='CONFIRMED')
     if queryset.exists():
-        updated = queryset.update(booking_status='RELEASED')    
-    #    modeladmin.message_user(request, f"{updated} bookings were successfully released.")
-    #else:
-    #    modeladmin.message_user(request, "No ONHOLD bookings selected.", level=messages.WARNING)
         for booking in queryset:
             username = booking.username
-            print(username)
+            print(booking.username)
             room_id = booking.room_id
+            hotel_id = booking.hotel_id
             print(room_id)
             user = Personal_data.objects.get(username=username)
             print(user)
             email = user.email
-            room = Hotel.objects.get(room_id=room_id)
-            room_price = room.room_price
+            print
+            hotel = Hotel_data.objects.get(hotel_id = hotel_id)
+            room = Room_data.objects.get(room_id=room_id)
+            room_price = room.price
             gst = room_price * 0.10
             total_paid = room_price + gst
-            hotel_name = booking.hotel_name
-            booking_status = "cancelled"  
-            subject = "Booking Status Notification"
+            hotel_name = hotel.hotel_name
             from_email = "admin@hotelbooking.com"
+            booking_status = 'CONFIRMED'
             to_email = [email]
             context = {
                 'username': username,
-                'booking_status': booking_status,
                 'room_price': room_price,
                 'gst': gst,
+                'booking_status': booking_status,
                 'total_paid': total_paid,
                 'hotel_name': hotel_name
             }   
             # Render the email template
-            html_content = render_to_string('booking_status_email.html', context)
+            html_content = render_to_string('bookingemail.html', context)
             text_content = f"Your booking has been {booking_status}. Hotel name: ${hotel_name}, Room price: ${room_price}, GST: ${gst}, Total paid: ${total_paid}" 
-            email_msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+            email_msg = EmailMultiAlternatives("Booking Status Notification", text_content, from_email, to_email)
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
+            updated = queryset.update(booking_status='RELEASED')   
 
         modeladmin.message_user(request, f"{updated} bookings were successfully released, and emails sent to users.")
     else:
         modeladmin.message_user(request, "No ONHOLD bookings selected.", level=messages.WARNING)
+
 # status of selected bookings from "ONHOLD" to "CONFIRMED" if they are in the "ONHOLD" status
 def confirm_bookings(modeladmin, request, queryset):
     # Filter to only apply to bookings with ONHOLD status
-    queryset = queryset.filter(booking_status='ONHOLD')
+    queryset = queryset.filter(booking_status='CONFIRMED')
     if queryset.exists():
-        updated = queryset.update(booking_status='CONFIRMED')
-        modeladmin.message_user(request, f"{updated} bookings were successfully confirmed.")
+        for booking in queryset:
+            username = booking.username
+            print(booking.username)
+            room_id = booking.room_id
+            hotel_id = booking.hotel_id
+            print(room_id)
+            user = Personal_data.objects.get(username=username)
+            print(user)
+            email = user.email
+            print
+            hotel = Hotel_data.objects.get(hotel_id = hotel_id)
+            room = Room_data.objects.get(room_id=room_id)
+            room_price = room.price
+            gst = room_price * 0.10
+            total_paid = room_price + gst
+            hotel_name = hotel.hotel_name
+            from_email = "admin@hotelbooking.com"
+            booking_status = 'CONFIRMED'
+            to_email = [email]
+            context = {
+                'username': username,
+                'room_price': room_price,
+                'gst': gst,
+                'booking_status': booking_status,
+                'total_paid': total_paid,
+                'hotel_name': hotel_name
+            }   
+            # Render the email template
+            html_content = render_to_string('bookingemail.html', context)
+            text_content = f"Your booking has been {booking_status}. Hotel name: ${hotel_name}, Room price: ${room_price}, GST: ${gst}, Total paid: ${total_paid}" 
+            email_msg = EmailMultiAlternatives("Booking Status Notification", text_content, from_email, to_email)
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
+            updated = queryset.update(booking_status='CONFIRMED')   
+
+        modeladmin.message_user(request, f"{updated} bookings were successfully confirmed, and emails sent to users.")
     else:
         modeladmin.message_user(request, "No ONHOLD bookings selected.", level=messages.WARNING)
 
@@ -75,8 +108,42 @@ def cancel_bookings(modeladmin, request, queryset):
     # Filter to only apply to bookings with CONFIRMED status
     queryset = queryset.filter(booking_status='CONFIRMED')
     if queryset.exists():
-        updated = queryset.update(booking_status='CANCELLED')
-        modeladmin.message_user(request, f"{updated} bookings were successfully cancelled.")
+        for booking in queryset:
+            username = booking.username
+            print(booking.username)
+            room_id = booking.room_id
+            hotel_id = booking.hotel_id
+            print(room_id)
+            user = Personal_data.objects.get(username=username)
+            print(user)
+            email = user.email
+            print
+            hotel = Hotel_data.objects.get(hotel_id = hotel_id)
+            room = Room_data.objects.get(room_id=room_id)
+            room_price = room.price
+            gst = room_price * 0.10
+            total_paid = room_price + gst
+            hotel_name = hotel.hotel_name
+            from_email = "admin@hotelbooking.com"
+            booking_status = 'CANCELLED'
+            to_email = [email]
+            context = {
+                'username': username,
+                'room_price': room_price,
+                'gst': gst,
+                'booking_status': booking_status,
+                'total_paid': total_paid,
+                'hotel_name': hotel_name
+            }   
+            # Render the email template
+            html_content = render_to_string('bookingemail.html', context)
+            text_content = f"Your booking has been {booking_status}. Hotel name: ${hotel_name}, Room price: ${room_price}, GST: ${gst}, Total paid: ${total_paid}" 
+            email_msg = EmailMultiAlternatives("Booking Status Notification", text_content, from_email, to_email)
+            email_msg.attach_alternative(html_content, "text/html")
+            email_msg.send()
+            updated = queryset.update(booking_status='CANCELLED')   
+
+        modeladmin.message_user(request, f"{updated} bookings were successfully cancelled, and emails sent to users.")
     else:
         modeladmin.message_user(request, "No CONFIRMED bookings selected.", level=messages.WARNING)
 

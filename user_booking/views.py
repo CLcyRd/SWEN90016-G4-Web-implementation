@@ -16,6 +16,7 @@ from django.db import IntegrityError
 from django.http import JsonResponse, HttpResponse
 import django.template.loader
 from datetime import datetime, timedelta
+from django.template.loader import render_to_string 
 
 
 # Create your views here.
@@ -340,15 +341,23 @@ def create_booking(request):
         )
         booking_record.save()
 
-        # 发送确认邮件
-        send_mail(
-            'Booking Confirmation',
-            f'Hi {username}, your booking for hotel {hotel_id} has been confirmed from {check_in_date} to {check_out_date}.',
-            'admin@hotelbooking.com',  # 发件人
-            [email],  # 收件人
-            fail_silently=False,
-        )
-
+        # Send confirmation
+        if booking_status == 'ONHOLD':
+            booking_status = 'put ONHOLD'
+        hotel = Hotel_data.objects.get(hotel_id = hotel_id)
+        room = Room_data.objects.get(room_id=room_id)
+        context = {
+            'username': username,
+            'room_price': room.price,
+            'gst': (room.price*0.1),
+            'booking_status': booking_status,
+            'total_paid': (room.price + room.price*0.1),
+            'hotel_name': hotel.hotel_name
+        }   
+        # Render the email template
+        html_content = render_to_string('bookingemail.html', context)
+        text_content = f"Your booking has been {booking_status}. Hotel name: ${hotel.hotel_name}, Room price: ${room.price}, GST: ${(room.price*0.1)}, Total paid: ${(room.price + room.price*0.1)}" 
+        send_mail(subject="Booking Status Notification",message=text_content,from_email="admin@hotelbooking.com",recipient_list=[email],html_message=html_content)
         
 
         return redirect('index')
@@ -416,7 +425,7 @@ def sendMessage(request,email):
     emailBox = [email]
     send_mail(
         'Your Verification Code',
-        '',  # Empty since we're using the HTML template
+        '', 
         'your-email@example.com',
         emailBox,
         fail_silently=False,
