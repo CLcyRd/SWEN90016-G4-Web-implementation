@@ -18,7 +18,7 @@ admin.site.register(Personal_data)
 # status of selected bookings from "ONHOLD" to "RELEASED" if they are in the "ONHOLD" status
 def release_bookings(modeladmin, request, queryset):
     # Filter to only apply to bookings with ONHOLD status
-    queryset = queryset.filter(booking_status='CONFIRMED')
+    queryset = queryset.filter(booking_status='ONHOLD')
     if queryset.exists():
         for booking in queryset:
             username = booking.username
@@ -37,7 +37,7 @@ def release_bookings(modeladmin, request, queryset):
             total_paid = room_price + gst
             hotel_name = hotel.hotel_name
             from_email = "admin@hotelbooking.com"
-            booking_status = 'CONFIRMED'
+            booking_status = 'RELEASED'
             to_email = [email]
             context = {
                 'username': username,
@@ -53,7 +53,7 @@ def release_bookings(modeladmin, request, queryset):
             email_msg = EmailMultiAlternatives("Booking Status Notification", text_content, from_email, to_email)
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
-            updated = queryset.update(booking_status='RELEASED')   
+        updated = queryset.update(booking_status='RELEASED')   
 
         modeladmin.message_user(request, f"{updated} bookings were successfully released, and emails sent to users.")
     else:
@@ -62,7 +62,7 @@ def release_bookings(modeladmin, request, queryset):
 # status of selected bookings from "ONHOLD" to "CONFIRMED" if they are in the "ONHOLD" status
 def confirm_bookings(modeladmin, request, queryset):
     # Filter to only apply to bookings with ONHOLD status
-    queryset = queryset.filter(booking_status='CONFIRMED')
+    queryset = queryset.filter(booking_status='ONHOLD')
     if queryset.exists():
         for booking in queryset:
             username = booking.username
@@ -97,7 +97,7 @@ def confirm_bookings(modeladmin, request, queryset):
             email_msg = EmailMultiAlternatives("Booking Status Notification", text_content, from_email, to_email)
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
-            updated = queryset.update(booking_status='CONFIRMED')   
+        updated = queryset.update(booking_status='CONFIRMED')   
 
         modeladmin.message_user(request, f"{updated} bookings were successfully confirmed, and emails sent to users.")
     else:
@@ -141,7 +141,7 @@ def cancel_bookings(modeladmin, request, queryset):
             email_msg = EmailMultiAlternatives("Booking Status Notification", text_content, from_email, to_email)
             email_msg.attach_alternative(html_content, "text/html")
             email_msg.send()
-            updated = queryset.update(booking_status='CANCELLED')   
+        updated = queryset.update(booking_status='CANCELLED')   
 
         modeladmin.message_user(request, f"{updated} bookings were successfully cancelled, and emails sent to users.")
     else:
