@@ -11,22 +11,6 @@ class Phone(models.Model):
         return f"{self.username} - {self.phone_number}"
     
 
-class Hotel(models.Model):
-    hotel_id = models.IntegerField()
-    room_id = models.IntegerField()
-    room_type = models.CharField(max_length=40)
-    hotel_name = models.CharField(max_length=100)
-    rate = models.IntegerField()
-    supplier_contract_name = models.CharField(max_length=100)
-    contact_phone_number = models.CharField(max_length=15)
-    business_registration_number = models.CharField(max_length=100)
-    hotel_url = models.URLField()
-    price = models.IntegerField()
-    meal_plan = models.CharField(max_length=100)
-    address = models.CharField(max_length=255, default="melbourne")  # Add an address field
-
-    def __str__(self):
-        return f"{self.hotel_name} - {self.room_type}"
     
 class Hotel_data(models.Model):
     hotel_id = models.AutoField(primary_key=True)

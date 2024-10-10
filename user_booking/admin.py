@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Phone, Hotel, Personal_data, Booking, Hotel_data, Room_data
+from .models import Phone, Personal_data, Booking, Hotel_data, Room_data
 from django.utils.html import format_html
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404

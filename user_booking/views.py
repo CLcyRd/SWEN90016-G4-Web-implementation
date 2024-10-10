@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from user_booking.models import Phone, Hotel, Personal_data, Booking, Hotel_data, Room_data
+from user_booking.models import Phone, Personal_data, Booking, Hotel_data, Room_data
 from user_booking.form import CSVUploadForm
 import csv
 import pandas
@@ -110,11 +110,10 @@ def sign_up(request):
         
         stored_otp = request.session.get('verify') 
         otp_timestamp = request.session.get('otp_timestamp')
-        # Verify reCAPTCHA
         recaptcha_validation = requests.post(
             'https://www.google.com/recaptcha/api/siteverify',
             data={
-                'secret': settings.RECAPTCHA_PRIVATE_KEY,  # Ensure RECAPTCHA_SECRET_KEY is in settings.py
+                'secret': settings.RECAPTCHA_PRIVATE_KEY,  
                 'response': recaptcha_response
             }
         )
