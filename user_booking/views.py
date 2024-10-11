@@ -24,20 +24,21 @@ def index(request):
 
         # Combine hotel and room data
         for room in rooms:
-            hotel_room_data.append({
-                'hotel_id': hotel.hotel_id,
-                'hotel_name': hotel.hotel_name,
-                'room_type': room.room_type,
-                'rate': hotel.rate,
-                'supplier_contract_name': hotel.supplier_contract_name,
-                'contact_phone_number': hotel.contact_phone_number,
-                'business_registration_number': hotel.business_registration_number,
-                'hotel_url': hotel.hotel_url,
-                'price': room.price,
-                'meal_plan': hotel.meal_plan,
-                'address': hotel.address,
-                'room_image': room.room_image,
-            })
+            if room.inventory > 0:
+                hotel_room_data.append({
+                    'hotel_id': hotel.hotel_id,
+                    'hotel_name': hotel.hotel_name,
+                    'room_type': room.room_type,
+                    'rate': hotel.rate,
+                    'supplier_contract_name': hotel.supplier_contract_name,
+                    'contact_phone_number': hotel.contact_phone_number,
+                    'business_registration_number': hotel.business_registration_number,
+                    'hotel_url': hotel.hotel_url,
+                    'price': room.price,
+                    'meal_plan': hotel.meal_plan,
+                    'address': hotel.address,
+                    'room_image': room.room_image,
+                })
 
     return render(request, 'index.html', {'hotels': hotel_room_data})
 
@@ -186,7 +187,7 @@ def book_hotel(request):
         hotel = get_object_or_404(Hotel_data, hotel_id=hotel_id)
         
         # Get the available rooms for the hotel from Room_data model
-        rooms = Room_data.objects.filter(hotel_id=hotel_id)
+        rooms = Room_data.objects.filter(hotel_id=hotel_id, inventory__gt= 0)
         
         # Get the current logged-in user
         user = request.user  
