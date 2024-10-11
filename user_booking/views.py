@@ -160,7 +160,7 @@ def upload_hotel_csv(request):
                                     hotel_id=hotel.hotel_id,
                                     room_type=row['room_type'],
                                     price=row['price'],
-                                    inventory=0  # Assuming inventory is 0 in this example
+                                    inventory=1
                                 )
                             except IntegrityError:
                                 errors.append(f"Room '{row['room_type']}' for Hotel '{row['hotel_name']}' already exists.")
